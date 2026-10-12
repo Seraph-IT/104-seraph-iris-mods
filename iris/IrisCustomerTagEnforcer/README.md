@@ -32,7 +32,7 @@ Loaded by IRIS plugin loader. Engineering team installs via Ansible role
 
 ## Configuration
 
-Pure-config lives outside this repo (`16-soc-enrichment/ansible/roles/.../vars/*.yml`).
+Pure-config lives outside this repo (`103-soc-enrichment/ansible/roles/.../vars/*.yml`).
 This module reads its config from the IRIS-standard plugin-config interface;
 no environment-specific values are hardcoded here.
 
@@ -43,4 +43,4 @@ AGPL-3.0-or-later (inherited from repo root).
 ## Status
 
 🚧 **Implementation pending** — this README documents the design contract.
-Engineer-Chat for `16-soc-enrichment` will deliver the module in Sub-Block 10.
+Engineer-Chat for `103-soc-enrichment` will deliver the module in Sub-Block 10.

@@ -40,4 +40,4 @@ AGPL-3.0-or-later (inherited from repo root).
 ## Status
 
 🚧 **Implementation pending** — this README documents the design contract.
-Engineer-Chat for `16-soc-enrichment` will deliver the module in Sub-Block 19.
+Engineer-Chat for `103-soc-enrichment` will deliver the module in Sub-Block 19.

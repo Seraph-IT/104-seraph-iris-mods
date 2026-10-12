@@ -1,7 +1,7 @@
 """MispCustomerTagEnforcer — defense-in-depth customer-tag enforcement for MISP.
 
 Mirror to IrisCustomerTagEnforcer; same regex contract. Public AGPL-3.0.
-V1-Blocker #3 for 16-soc-enrichment (Sub-Block 19).
+V1-Blocker #3 for 103-soc-enrichment (Sub-Block 19).
 """
 
 from .enforcer import (

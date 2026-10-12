@@ -6,7 +6,7 @@ case create/update. Violations raise; the hook layer translates them into
 (rule-range **102600-102699**, see `audit.py`).
 
 The range in this docstring used to read 102400-102499. That block was handed to
-`18-active-directory` on 2026-05-26, so a rule written against this text would
+`030-active-directory` on 2026-05-26, so a rule written against this text would
 have collided with someone else's detections.
 """
 from __future__ import annotations
