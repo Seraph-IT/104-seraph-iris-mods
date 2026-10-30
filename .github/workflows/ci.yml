@@ -1,0 +1,65 @@
+---
+# CI
+# Mindeststand CI: Secrets-Scan, Lint, vorhandene Tests. Rueckweg: diese Datei loeschen.
+# Runner-Label wie in den uebrigen Seraph-Repos. Auf Gitea laufen gespiegelte Pushes nicht
+# von selbst an, deshalb zusaetzlich schedule und workflow_dispatch.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '21 4 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Secrets (gitleaks)
+    runs-on: [self-hosted, gitea-runner]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks 8.18.4
+        run: |
+          curl -sSfL -o /tmp/gitleaks.tar.gz             https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
+          tar -xzf /tmp/gitleaks.tar.gz -C /usr/local/bin gitleaks
+          gitleaks version
+      - name: Scan git history
+        run: |
+          # Ab 8.19 heisst der Befehl `git`, davor `detect`.
+          if gitleaks git --help >/dev/null 2>&1; then
+            gitleaks git --no-banner --redact --exit-code 1 .
+          else
+            gitleaks detect --source . --no-banner --redact --exit-code 1
+          fi
+
+  python:
+    name: Python (ruff, pytest)
+    runs-on: [self-hosted, gitea-runner]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: ruff (nur Warnung)
+        continue-on-error: true
+        run: |
+          pip install --quiet ruff
+          ruff check iris misp
+      - name: pytest iris
+        run: |
+          pip install --quiet pytest
+          cd iris/IrisCustomerTagEnforcer && python -m pytest -q -p no:cacheprovider
+      - name: pytest misp
+        run: |
+          cd misp/MispCustomerTagEnforcer && python -m pytest -q -p no:cacheprovider
