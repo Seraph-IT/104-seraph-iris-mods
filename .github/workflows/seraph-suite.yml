@@ -10,8 +10,8 @@
 # GitHub Actions ist org-weit aus; der Waechter auf server_url verhindert trotzdem jeden Lauf auf github.com.
 name: seraph-suite
 
-# Ausloeser (Hermes 25.11.2026): pull_request, push auf main, Zeitplan und Hand. Kein push auf andere Branches mehr,
-# sonst lief die Suite je Branch-Push und noch einmal fuer den PR (Schlange wuchs).
+# Ausloeser (Hermes 25.11.2026): pull_request, push auf den Standardbranch (main, in 301 master), Zeitplan und
+# Hand. Kein push auf andere Branches mehr, sonst lief die Suite je Branch-Push und noch einmal fuer den PR.
 on:
   push:
     branches: [main]
@@ -20,9 +20,13 @@ on:
     - cron: "53 1 * * 0"   # Slot aus 106 ci-templates/nachtlauf.yml
   workflow_dispatch:
 
-# PRs: ein neuerer Push bricht den aelteren Lauf ab. Auf main traegt die Gruppe die SHA, dort wird nie abgebrochen.
+# PRs: ein neuerer Push bricht den aelteren Lauf ab. Auf dem Standardbranch traegt die Gruppe die SHA, dort wird nie
+# abgebrochen.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+  # Gefaltet (>-), damit keine Zeile ueber 120 Zeichen hat (ansible-lint in 002, 26.11.2026).
+  group: >-
+    ${{ github.workflow }}-${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch || 'main')
+    && github.sha || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -40,4 +44,7 @@ jobs:
         cd iris/IrisCustomerTagEnforcer && python -m pytest -q -p no:cacheprovider
         && cd ../../misp/MispCustomerTagEnforcer && python -m pytest -q -p no:cacheprovider
       vorbereitung: "pip install pytest==9.2.0"
+      # Ohne test_befehl sucht der Hub einen eigenen Workflow mit Testaufruf auf push und pull_request, sonst rot.
+      # tests_begruendung: "Repo hat nichts, was ein Test pruefen kann, weil ..."
+      # tests_in: "ci.yml"
     secrets: inherit
