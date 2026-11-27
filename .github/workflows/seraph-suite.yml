@@ -34,6 +34,10 @@ jobs:
     with:
       typ: python            # python | ansible | frappe | web | terraform | powershell | generisch
       # lint_befehl: "ruff check ."
-      # test_befehl: "pytest -q"
-      # vorbereitung: "pip install -r requirements-dev.txt"
+      # Bis 27.11.2026 ohne test_befehl: die 29 Tests der beiden Enforcer liefen in keiner CI (Hermes, Liste in
+      # devops .scratch/106-e2e-errors/hub-test-befehl-liste.md). Jedes Paket hat eigene pytest-Wurzel (pyproject).
+      test_befehl: >-
+        cd iris/IrisCustomerTagEnforcer && python -m pytest -q -p no:cacheprovider
+        && cd ../../misp/MispCustomerTagEnforcer && python -m pytest -q -p no:cacheprovider
+      vorbereitung: "pip install pytest==9.2.0"
     secrets: inherit
